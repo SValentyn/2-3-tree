@@ -6,7 +6,7 @@
  
  ---
  
-Description project: structure and processing of [2-3 tree](https://en.wikipedia.org/wiki/2–3_tree). Comments in the program in Russian (will change later). Also presented is my term paper on this topic (but in Ukrainian). 
+Description project: structure and processing of [2-3 tree](https://en.wikipedia.org/wiki/2–3_tree). Comments in the program in Russian. Also presented is my term paper on this topic (but in Ukrainian). 
 
 ---
 
