@@ -1,15 +1,16 @@
+
 /**
- * Класс реализует структуру данных "2-3-дерево".
- * Такая структура хранит элементы в виде древовидной структуры, но сбалансированные.
+ * Implements the "2-3-tree" data structure.
+ * The structure stores elements in the form of a tree, but balanced.
  */
-class Tree23<T extends Comparable<T>> {
+ class Tree23<T extends Comparable<T>> {
 
     private static final int ROOT_IS_BIGGER = 1;
     private static final int ROOT_IS_SMALLER = -1;
 
-    private Node root;         // Корень дерева
-    private int size;          // Количество элементов дерева
-    private boolean addition;  // Флаг, чтобы знать, был ли последний элемент добавлен правильно или нет
+    private Node root;         // Tree root
+    private int size;          // The number of tree elements
+    private boolean addition;  // Tracks if the last item was added correctly or not.
 
     Tree23() {
         this.root = new Node();
@@ -17,7 +18,7 @@ class Tree23<T extends Comparable<T>> {
     }
 
     /**
-     * @return true, если дерево пусто, иначе false
+     * @return true, the tree is empty, otherwise false
      */
     public boolean isEmpty() {
         if (root == null) return true;
@@ -25,33 +26,32 @@ class Tree23<T extends Comparable<T>> {
     }
 
     /**
-     * Метод, для проверки, содержится ли данный узел в дереве
+     * Check if the given element is in the tree
      *
-     * @param element элемент для поиска
-     * @return true, если это дерево содержит указанный элемент, иначе false
+     * @param element the element to check
+     * @return true, if the element is found, otherwise false
      */
     public boolean contains(T element) {
         return search(element);
     }
 
     /**
-     * @return кол-во элементов дерева
-     */
+     * @return number of elements in the tree */
     public int size() {
         return size;
     }
 
     /**
-     * Метод, для добавления нового элемента в дерево, сохраняя его сбалансированным
+     * Adds a new element to the tree, keeping it balanced
      *
-     * @param element элемент для добавления
+     * @param element item to add
      */
     public void add(T element) {
 
         size++;
         addition = false;
 
-        if (root == null || root.getLeftElement() == null) { // первый случай
+        if (root == null || root.getLeftElement() == null) { // first case
             if (root == null) {
                 root = new Node();
             }
@@ -69,30 +69,30 @@ class Tree23<T extends Comparable<T>> {
     }
 
     /**
-     * @param current узел, в который нужно добавить
-     * @param element элемент для вставки
+     * @param current node to add to
+     * @param element item to add
      */
     private Node add(Node current, T element) {
 
         Node newParent = null; // узел, который будет добавлен
 
-        /* мы еще не на самом глубоком уровне */
+        /* we are not yet at the deepest level */
         if (!current.isLeaf()) {
 
             Node newNode;
 
-            /* такой элемент уже существует */
+            /* element already exists */
             if (current.leftElement.compareTo(element) == 0 || (current.is3Node() && current.rightElement.compareTo(element) == 0)) {
             }
 
-            // newNode меньше левого элемента
+            // newNode < left element
             else if (current.leftElement.compareTo(element) == ROOT_IS_BIGGER) {
                 newNode = add(current.left, element);
 
-                // newNode приходит из левой ветви
+                // newNode comes from the left branch
                 if (newNode != null) {
 
-                    // newNode, в этом случае, всегда меньше, чем current.left
+                    // newNode < than current.left
                     if (current.is2Node()) {
                         current.rightElement = current.leftElement; // сдвинуть текущий левый элемент вправо
                         current.leftElement = newNode.leftElement;
@@ -101,19 +101,19 @@ class Tree23<T extends Comparable<T>> {
                         current.left = newNode.left;
                     }
 
-                    // В этом случае у нас новое разделение, поэтому текущий элемент слева будет подниматься
+                    // we have a new division, so the current element on the left will rise
                     else {
 
-                        // копируем правую часть поддерева
+                        // copy the right side of the subtree
                         Node rightCopy = new Node(current.rightElement, null, current.mid, current.right);
 
-                        // создаем новую «структуру», вставляя правую часть
+                        // create a new “structure” by inserting the right side
                         newParent = new Node(current.leftElement, null, newNode, rightCopy);
                     }
                 }
             }
 
-            // newNode больше левого и меньше правого
+            // newNode is > left and < right
             else if (current.is2Node() || (current.is3Node() && current.rightElement.compareTo(element) == ROOT_IS_BIGGER)) {
 
                 newNode = add(current.mid, element);

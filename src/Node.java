@@ -1,14 +1,14 @@
 /**
- * Дерево-2-3 образовано узлами, в которых хранятся элементы структуры.
- * Каждый узел содержит не более двух элементов и не менее одного.
+ * Tree-2-3 is formed by nodes in which structural elements are stored.
+ * Each node contains no more than two elements and at least one.
  */
 class Node<T extends Comparable<T>> {
 
-    Node left;      // левый потомок
-    Node mid;       // средний потомок
-    Node right;     // правый потомок
-    T leftElement;  // элемент слева
-    T rightElement; // элемент справа
+    Node left;      // left child
+    Node mid;       // middle child
+    Node right;     // right
+    T leftElement;  // left element
+    T rightElement; // right element
 
     public Node() {
         this.left = null;
@@ -19,7 +19,7 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * Конструктор 3-х узлов без определенных потомков (нулевые ссылки).
+     * Constructor of 3 nodes without specific descendants (null references).
      */
     public Node(T leftElement, T rightElement) {
         this.leftElement = leftElement;
@@ -30,7 +30,7 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * Конструктор 3-х узлов с заданными левым и средним узлами/потомками.
+     * Constructor of 3 nodes with given left and middle nodes / descendants.
      */
     public Node(T leftElement, T rightElement, Node left, Node mid) {
         this.leftElement = leftElement;
@@ -80,39 +80,39 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * @return true, если мы находимся на самом глубоком уровне дерева, иначе false
+     * @return true, if we are at the deepest level of a tree, otherwise false
      */
     public boolean isLeaf() {
         return left == null && mid == null && right == null;
     }
 
     /**
-     * @return true, если правого узла не существует, иначе false
+     * @return true, if the right node does not exist, otherwise false
      */
     public boolean is2Node() {
         return rightElement == null;
     }
 
     /**
-     * @return true, если правый узел существует, иначе false
+     * @return true, if the right node exists, otherwise false
      */
     public boolean is3Node() {
         return rightElement != null;
     }
 
     /**
-     * Метод, для проверки, хорошо ли сбалансировано дерево
+     * Method for checking if a tree is well balanced
      *
-     * @return true если дерево хорошо сбалансировано, иначе false
+     * @return true if the tree is well balanced, otherwise false
      */
     boolean isBalanced() {
 
         boolean balanced = false;
 
-        if (isLeaf()) { // Если мы находимся на самом глубоком уровне (лист), он точно сбалансирован
+        if (isLeaf()) { // If we are at the deepest level (leaf), it is balanced
             balanced = true;
 
-        } else if (left.getLeftElement() != null && mid.getLeftElement() != null) { // Есть два случая: 2 узла или 3 узла
+        } else if (left.getLeftElement() != null && mid.getLeftElement() != null) { // There are two cases: 2 nodes or 3 nodes
 
             if (rightElement != null) { // 3 узла
                 if (right.getLeftElement() != null) {
@@ -130,35 +130,35 @@ class Node<T extends Comparable<T>> {
 
         T max;
 
-        /* Тривиальный случай, мы находимся на самом глубоком уровне дерева */
+        /* Trivial case, we are at the deepest level of the tree */
         if (isLeaf()) {
 
             if (getRightElement() != null) {
                 max = getRightElement();
                 setRightElement(null);
-                // Нам повезло, нам ничего не нужно перебалансировать
+                // We are lucky, we do not need to rebalance anything
             } else {
                 max = getLeftElement();
                 setLeftElement(null);
-                // На первом этапе рекурсивной функции произойдет перебалансировка
+                // At the first stage of the recursive function, rebalancing will occur
             }
         }
 
-        /* Рекурсивный случай, мы не на самом глубоком уровне */
+        /* Recursive case, we are not at the deepest level */
         else {
 
-            // Если есть элемент справа, мы продолжаем справа
+            // 
             if (getRightElement() != null) {
                 max = (T) right.replaceMax();
             }
 
-            // Иначе, продолжаем со средним
+            //If there is an element on the right, we continue on the right
             else {
                 max = (T) mid.replaceMax();
             }
         }
 
-        /* Сохраняем баланс */
+        /* Keep balance */
         if (!isBalanced()) {
             reBalance();
         }
@@ -167,31 +167,31 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * @return минимальный элемент
+     * @return minimum element
      */
     T replaceMin() {
 
         T min;
 
-        /* Тривиальный случай, мы находимся на самом глубоком уровне дерева */
+        /* Trivial case, we are at the deepest level of the tree */
         if (isLeaf()) {
 
             min = leftElement;
             leftElement = null;
 
-            // Элемент был справа, мы пропустили его слева, и здесь ничего не произошло
+            // The element was on the right, we skipped it on the left, and nothing happened here
             if (rightElement != null) {
                 leftElement = rightElement;
                 rightElement = null;
             }
         }
 
-        /* Рекурсивный случай, пока мы не достигаем самого глубокого уровня, мы всегда спускаемся влево */
+        /* A recursive case, until we reach the deepest level, we always go down to the left */
         else {
             min = (T) left.replaceMin();
         }
 
-        // Сохраняем баланс
+        // Keep balance
         if (!isBalanced()) {
             reBalance();
         }
@@ -200,48 +200,48 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * Метод, для сохранение баланса, путём перебалансировки
-     * самого глубокого уровня дерева начиная со второго самого глубокого
+     * Method for maintaining balance by rebalancing
+     * the deepest level of the tree starting from the second deepest 
      */
     void reBalance() {
 
         while (!isBalanced()) {
 
-            /*  Дисбаланс в левом потомке */
+            /* Imbalance in the left child  */
             if (getLeftNode().getLeftElement() == null) {
 
-                // Мы ставим левый элемент текущего узла как левый элемент левого потомка
+                // We put the left element of the current node as the left element of the left child
                 getLeftNode().setLeftElement(getLeftElement());
 
-                // Теперь мы заменяем левый элемент среднего потомка как левый элемент текущего узла
+                // Now we replace the left element of the middle descendant as the left element of the current node
                 setLeftElement((T) getMidNode().getLeftElement());
 
-                // Если правый элемент на среднем дочернем элементе существует, мы сдвигаем его влево
+                // If the right element on the middle child exists, we move it to the left
                 if (getMidNode().getRightElement() != null) {
                     getMidNode().setLeftElement(getMidNode().getRightElement());
                     getMidNode().setRightElement(null);
                 }
 
-                // Иначе, мы дадим среднему потомку "empty", так что следующая итерация может разрешить эту ситуацию,
-                // если нет, то здесь начинается критический случай
+                // Otherwise, we will make the middle descendant "empty", so the next iteration can resolve this situation,
+                // if not, then the critical case begins
                 else {
                     getMidNode().setLeftElement(null);
                 }
 
             }
 
-            /* Дисбаланс в правом ребенке */
+            /* Imbalance in the right child */
             else if (getMidNode().getLeftElement() == null) {
 
-                // Критический случай, каждый узел (дочерний элемент) самого глубокого уровня
-                // имеет только один элемент, алгоритм должен будет выполнить балансировку с более высокого уровня дерева
+                // Critical case, each node (child) of the deepest level
+                // has only one element, the algorithm will have to perform balancing from a higher tree level
                 if (getRightElement() == null) {
 
                     if (getLeftNode().getLeftElement() != null && getLeftNode().getRightElement() == null && getMidNode().getLeftElement() == null) {
                         setRightElement(getLeftElement());
                         setLeftElement((T) getLeftNode().getLeftElement());
 
-                        // мы удаляем текущих потомков
+                        // we delete current descendants
                         setLeftNode(null);
                         setMidNode(null);
                         setRightNode(null);
@@ -266,32 +266,32 @@ class Node<T extends Comparable<T>> {
 
                 } else {
 
-                    // Мы ставим правый элемент текущего узла как левый элемент среднего сына
+                    // We put the right element of the current node as the left element of the middle child
                     getMidNode().setLeftElement(getRightElement());
 
-                    // Мы помещаем левый элемент правого потомка в качестве правого элемента текущего узла
+                    // We put the left element of the right child as the right element of the current node
                     setRightElement((T) getRightNode().getLeftElement());
 
-                    // Если правый дочерний элемент, в котором мы взяли последний элемент,
-                    // имеет правый элемент, мы перемещаем его слева от того же дочернего элемента.
+                    // If the right child in which we took the last element
+                    // has the right element, we move it to the left of the same child element.
                     if (getRightNode().getRightElement() != null) {
                         getRightNode().setLeftElement(getRightNode().getRightElement());
                         getRightNode().setRightElement(null);
 
                     }
 
-                    // Иначе мы дадим нужному ребенку "empty"
+                    // Otherwise, we will make the right child "empty"
                     else {
                         getRightNode().setLeftElement(null);
                     }
                 }
             }
 
-            /* Дисбаланс в правом потомке */
+            /* Imbalance on the right */
             else if (getRightElement() != null && getRightNode().getLeftElement() == null) {
 
-                // *** Ситуация 1 ***
-                // Средний ребенок существует, поэтому мы делаем сдвиг элементов вправо
+                // *** Situation 1 ***
+                // The middle child exists, so we shift the elements to the right
                 if (getMidNode().getRightElement() != null) {
                     getRightNode().setLeftElement(getRightElement());
                     setRightElement((T) getMidNode().getRightElement());
@@ -299,9 +299,9 @@ class Node<T extends Comparable<T>> {
 
                 }
 
-                // *** Ситуация 2 ***
-                // Средний дочерний элемент имеет только левый элемент,
-                // тогда мы должны поместить правый элемент текущего узла в качестве правого элемента среднего дочернего элемента.
+                // *** Situation 2 ***
+                // The middle child has only the left element,
+                // then we need to put the right element of the current node as the right element of the middle child.
                 else {
                     getMidNode().setRightElement(getRightElement());
                     setRightElement(null);
