@@ -8,7 +8,15 @@
  
 Description project: structure and processing of [2-3-tree](https://en.wikipedia.org/wiki/2–3_tree).  
 Also presented is my term paper on this topic (but in Ukrainian). 
-
+  
+Below is an `application class diagram`:
+<p align="center">
+  <img width="780px" height="480px" alt="Application class diagram" title="Application class diagram" 
+        src="https://github.com/SValentyn/2-3-tree/blob/master/diagram.png">
+</p>
+  
+--- 
+  
 ## Support
 
 Patches are welcome and can be submitted by forking this project and submitting a pull request via GitHub.  
