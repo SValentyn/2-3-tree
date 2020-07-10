@@ -1,19 +1,21 @@
 /**
  * Tree-2-3 is formed by nodes in which structural elements are stored.
  * Each node contains no more than two elements and at least one.
+ *
+ * @author Syniuk Valentyn
  */
-class Node<T extends Comparable<T>> {
+public class Node<T extends Comparable<T>> {
 
-    Node left;      // left child
-    Node mid;       // middle child
-    Node right;     // right
-    T leftElement;  // left element
-    T rightElement; // right element
+    Node leftChild;
+    Node middleChild;
+    Node rightChild;
+    T leftElement;
+    T rightElement;
 
     public Node() {
-        this.left = null;
-        this.mid = null;
-        this.right = null;
+        this.leftChild = null;
+        this.middleChild = null;
+        this.rightChild = null;
         this.leftElement = null;
         this.rightElement = null;
     }
@@ -24,19 +26,19 @@ class Node<T extends Comparable<T>> {
     public Node(T leftElement, T rightElement) {
         this.leftElement = leftElement;
         this.rightElement = rightElement;
-        left = null;
-        mid = null;
-        right = null;
+        leftChild = null;
+        middleChild = null;
+        rightChild = null;
     }
 
     /**
      * Constructor of 3 nodes with given left and middle nodes / descendants.
      */
-    public Node(T leftElement, T rightElement, Node left, Node mid) {
+    public Node(T leftElement, T rightElement, Node leftChild, Node middleChild) {
         this.leftElement = leftElement;
         this.rightElement = rightElement;
-        this.left = left;
-        this.mid = mid;
+        this.leftChild = leftChild;
+        this.middleChild = middleChild;
     }
 
     public T getLeftElement() {
@@ -56,34 +58,34 @@ class Node<T extends Comparable<T>> {
     }
 
     private void setLeftNode(Node left) {
-        this.left = left;
+        this.leftChild = left;
     }
 
     public Node getLeftNode() {
-        return left;
+        return leftChild;
     }
 
     private void setMidNode(Node mid) {
-        this.mid = mid;
+        this.middleChild = mid;
     }
 
     public Node getMidNode() {
-        return mid;
+        return middleChild;
     }
 
     private void setRightNode(Node right) {
-        this.right = right;
+        this.rightChild = right;
     }
 
     public Node getRightNode() {
-        return right;
+        return rightChild;
     }
 
     /**
      * @return true, if we are at the deepest level of a tree, otherwise false
      */
     public boolean isLeaf() {
-        return left == null && mid == null && right == null;
+        return leftChild == null && middleChild == null && rightChild == null;
     }
 
     /**
@@ -112,13 +114,13 @@ class Node<T extends Comparable<T>> {
         if (isLeaf()) { // If we are at the deepest level (leaf), it is balanced
             balanced = true;
 
-        } else if (left.getLeftElement() != null && mid.getLeftElement() != null) { // There are two cases: 2 nodes or 3 nodes
+        } else if (leftChild.getLeftElement() != null && middleChild.getLeftElement() != null) { // There are two cases: 2 nodes or 3 nodes
 
-            if (rightElement != null) { // 3 узла
-                if (right.getLeftElement() != null) {
+            if (rightElement != null) { // 3 nodes
+                if (rightChild.getLeftElement() != null) {
                     balanced = true;
                 }
-            } else {  // 2 узла
+            } else {  // 2 nodes
                 balanced = true;
             }
         }
@@ -149,12 +151,12 @@ class Node<T extends Comparable<T>> {
 
             // 
             if (getRightElement() != null) {
-                max = (T) right.replaceMax();
+                max = (T) rightChild.replaceMax();
             }
 
-            //If there is an element on the right, we continue on the right
+            // If there is an element on the right, we continue on the right
             else {
-                max = (T) mid.replaceMax();
+                max = (T) middleChild.replaceMax();
             }
         }
 
@@ -188,7 +190,7 @@ class Node<T extends Comparable<T>> {
 
         /* A recursive case, until we reach the deepest level, we always go down to the left */
         else {
-            min = (T) left.replaceMin();
+            min = (T) leftChild.replaceMin();
         }
 
         // Keep balance
@@ -200,8 +202,7 @@ class Node<T extends Comparable<T>> {
     }
 
     /**
-     * Method for maintaining balance by rebalancing
-     * the deepest level of the tree starting from the second deepest 
+     * Method for maintaining balance by rebalancing the deepest level of the tree starting from the second deepest
      */
     void reBalance() {
 
@@ -227,7 +228,6 @@ class Node<T extends Comparable<T>> {
                 else {
                     getMidNode().setLeftElement(null);
                 }
-
             }
 
             /* Imbalance in the right child */
@@ -241,7 +241,7 @@ class Node<T extends Comparable<T>> {
                         setRightElement(getLeftElement());
                         setLeftElement((T) getLeftNode().getLeftElement());
 
-                        // we delete current descendants
+                        // We delete current descendants
                         setLeftNode(null);
                         setMidNode(null);
                         setRightNode(null);

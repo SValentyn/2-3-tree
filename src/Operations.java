@@ -1,18 +1,19 @@
-
 /**
  * Implements the "2-3-tree" data structure.
  * The structure stores elements in the form of a tree, but balanced.
+ *
+ * @author Syniuk Valentyn
  */
- class Tree23<T extends Comparable<T>> {
+public class Operations<T extends Comparable<T>> {
 
     private static final int ROOT_IS_BIGGER = 1;
     private static final int ROOT_IS_SMALLER = -1;
 
-    private Node root;         // Tree root
-    private int size;          // The number of tree elements
-    private boolean addition;  // Tracks if the last item was added correctly or not.
+    private Node root;      // Tree root
+    private int size;       // The number of tree elements
+    private boolean flag;   // Tracks if the last element was added correctly or not.
 
-    Tree23() {
+    Operations() {
         this.root = new Node();
         this.size = 0;
     }
@@ -36,7 +37,8 @@
     }
 
     /**
-     * @return number of elements in the tree */
+     * @return number of elements in the tree
+     */
     public int size() {
         return size;
     }
@@ -44,20 +46,19 @@
     /**
      * Adds a new element to the tree, keeping it balanced
      *
-     * @param element item to add
+     * @param element - element to add
      */
     public void add(T element) {
+        flag = false;
 
-        size++;
-        addition = false;
+        if (root == null || root.getLeftElement() == null) {
+            flag = true;
 
-        if (root == null || root.getLeftElement() == null) { // first case
             if (root == null) {
                 root = new Node();
             }
-            root.setLeftElement(element);
-            addition = true;
 
+            root.setLeftElement(element);
         } else {
             Node newRoot = add(root, element);
             if (newRoot != null) {
@@ -65,49 +66,49 @@
             }
         }
 
-        if (!addition) size--;
+        if (flag) size++;
     }
 
     /**
      * @param current node to add to
-     * @param element item to add
+     * @param element - element to add
      */
     private Node add(Node current, T element) {
 
-        Node newParent = null; // узел, который будет добавлен
+        Node newParent = null; // Node to be added
 
-        /* we are not yet at the deepest level */
+        // We are not yet at the deepest level
         if (!current.isLeaf()) {
 
             Node newNode;
 
-            /* element already exists */
+            // Element already exists
             if (current.leftElement.compareTo(element) == 0 || (current.is3Node() && current.rightElement.compareTo(element) == 0)) {
             }
 
             // newNode < left element
             else if (current.leftElement.compareTo(element) == ROOT_IS_BIGGER) {
-                newNode = add(current.left, element);
+                newNode = add(current.leftChild, element);
 
                 // newNode comes from the left branch
                 if (newNode != null) {
 
                     // newNode < than current.left
                     if (current.is2Node()) {
-                        current.rightElement = current.leftElement; // сдвинуть текущий левый элемент вправо
+                        current.rightElement = current.leftElement; // Move the current left element to the right
                         current.leftElement = newNode.leftElement;
-                        current.right = current.mid;
-                        current.mid = newNode.mid;
-                        current.left = newNode.left;
+                        current.rightChild = current.middleChild;
+                        current.middleChild = newNode.middleChild;
+                        current.leftChild = newNode.leftChild;
                     }
 
-                    // we have a new division, so the current element on the left will rise
+                    // We have a new division, so the current element on the left will rise
                     else {
 
-                        // copy the right side of the subtree
-                        Node rightCopy = new Node(current.rightElement, null, current.mid, current.right);
+                        // Copy the right side of the subtree
+                        Node rightCopy = new Node(current.rightElement, null, current.middleChild, current.rightChild);
 
-                        // create a new “structure” by inserting the right side
+                        // Create a new "structure" by inserting the right side
                         newParent = new Node(current.leftElement, null, newNode, rightCopy);
                     }
                 }
@@ -116,64 +117,63 @@
             // newNode is > left and < right
             else if (current.is2Node() || (current.is3Node() && current.rightElement.compareTo(element) == ROOT_IS_BIGGER)) {
 
-                newNode = add(current.mid, element);
+                newNode = add(current.middleChild, element);
 
-                // новое разделение
+                // New division
                 if (newNode != null) {
 
-                    // правый элемент пуст, поэтому мы можем установить newNode слева, а существующий левый элемент - справа
+                    // The right element is empty, so we can set newNode on the left, and the existing left element on the right
                     if (current.is2Node()) {
                         current.rightElement = newNode.leftElement;
-                        current.right = newNode.mid;
-                        current.mid = newNode.left;
+                        current.rightChild = newNode.middleChild;
+                        current.middleChild = newNode.leftChild;
                     }
 
-                    // еще один случай, когда мы должны снова разделить
+                    // Another case where we have to split again
                     else {
-                        Node left = new Node(current.leftElement, null, current.left, newNode.left);
-                        Node mid = new Node(current.rightElement, null, newNode.mid, current.right);
+                        Node left = new Node(current.leftElement, null, current.leftChild, newNode.leftChild);
+                        Node mid = new Node(current.rightElement, null, newNode.middleChild, current.rightChild);
                         newParent = new Node(newNode.leftElement, null, left, mid);
                     }
                 }
             }
 
-            // newNode больше, чем правый элемент
+            // newNode is larger than the right element
             else if (current.is3Node() && current.rightElement.compareTo(element) == ROOT_IS_SMALLER) {
 
-                newNode = add(current.right, element);
+                newNode = add(current.rightChild, element);
 
-                // разделение -> правый элемент поднимается
+                // Divide -> the right element rises
                 if (newNode != null) {
-                    Node leftCopy = new Node(current.leftElement, null, current.left, current.mid);
+                    Node leftCopy = new Node(current.leftElement, null, current.leftChild, current.middleChild);
                     newParent = new Node(current.rightElement, null, leftCopy, newNode);
                 }
             }
         }
 
-        /* Мы на самом глубоком уровне */
+        // We are at the deepest level
         else {
+            flag = true;
 
-            addition = true;
-
-            /* такой элемент уже существует */
+            // Element already exists
             if (current.leftElement.compareTo(element) == 0 || (current.is3Node() && current.rightElement.compareTo(element) == 0)) {
-                addition = false;
+                flag = false;
             }
 
-            /* случай, когда нет правильного элемента */
+            // The case when there is no right element
             else if (current.is2Node()) {
 
-                // если текущий левый элемент больше чем newNode, мы сдвигаем левый элемент вправо
+                // If the current left element is larger than newNode, we move the left element to the right
                 if (current.leftElement.compareTo(element) == ROOT_IS_BIGGER) {
                     current.rightElement = current.leftElement;
                     current.leftElement = element;
                 }
 
-                // если newNode больше, мы добавляем его справа
+                // If newNode is larger, we add it to the right
                 else if (current.leftElement.compareTo(element) == ROOT_IS_SMALLER) current.rightElement = element;
             }
 
-            /* Случай когда в узле 2 элемента, и мы хотим добавить еще один. Для этого мы разделяем узел */
+            // The case when the node has 2 elements, and we want to add another one. To do this, we share the node
             else newParent = split(current, element);
         }
 
@@ -181,38 +181,33 @@
     }
 
     /**
-     * Создает новую структуру узла, которая будет присоединена в нижней части метода add
+     * The method creates a new node structure that will be attached at the bottom of the add() method
      *
-     * @param current узел, где происходит разделение
-     * @param element элемент для вставки
-     * @return двухузловая структура с ненулевым левым и средним узлом
+     * @param current - the node where the separation occurs
+     * @param element - element to insert
+     * @return two-node structure with a nonzero left and middle node
      */
     private Node split(Node current, T element) {
 
         Node newParent = null;
 
-        /* левый элемент больше, поэтому он будет подниматься, позволяя встать newParent слева */
+        // The left element is larger, so it will rise, allowing newParent to stand on the left
         if (current.leftElement.compareTo(element) == ROOT_IS_BIGGER) {
             Node<T> left = new Node<>(element, null);
             Node right = new Node(current.rightElement, null);
             newParent = new Node(current.leftElement, null, left, right);
 
         } else if (current.leftElement.compareTo(element) == ROOT_IS_SMALLER) {
+            Node left = new Node(current.leftElement, null);
 
-            // newParent больше текущего справа и меньше правого элемента
-            // newParent поднимается
+            // newParent is greater than the current on the right and smaller than the right. newParent rises.
             if (current.rightElement.compareTo(element) == ROOT_IS_BIGGER) {
-
-                Node left = new Node(current.leftElement, null);
                 Node right = new Node(current.rightElement, null);
                 newParent = new Node(element, null, left, right);
-
             }
 
-            // newParent самый большой, поэтому текущий правый элемент поднимается
+            // newParent is the largest, so the current right element is raised
             else {
-
-                Node left = new Node(current.leftElement, null);
                 Node<T> right = new Node<>(element, null);
                 newParent = new Node(current.rightElement, null, left, right);
             }
@@ -222,134 +217,131 @@
     }
 
     /**
-     * Метод, для удаления элемента из дерева
+     * Method for removing an element from the tree
      *
-     * @param element элемента для удаления
-     * @return true, если элемент был удалён, иначе false
+     * @param element - element to remove
+     * @return true, if the element was removed, otherwise false
      */
     public boolean remove(T element) {
-        boolean ifRemoved;
 
-        // уменьшаем кол-во уровней в начале
+        // Reduce the number of levels at the beginning
         this.size--;
 
-        ifRemoved = remove(root, element);
+        boolean ifRemoved = remove(root, element);
 
         root.reBalance();
 
-        // если удалили последний элемент дерева
+        // If you deleted the last element of the tree
         if (root.getLeftElement() == null) root = null;
 
-        // если элемент не был удалён, увеличиваем кол-во уровней
+        // If the element could not be deleted, then increase the number of levels
         if (!ifRemoved) this.size++;
 
         return ifRemoved;
     }
 
     /**
-     * @param current узел из которого нужно удалить
-     * @param element элемент который нужно удалить
-     * @return true, если элемент был удалён, иначе false
+     * @param current - node to be deleted
+     * @param element - element to be deleted
+     * @return true, if the element was deleted, otherwise false
      */
     private boolean remove(Node current, T element) {
         boolean ifRemoved = true;
 
-        /* Случай, когда мы находимся в самом глубоком уровне дерева, но мы не нашли элемент (он не существует) */
+        // The case when we are at the deepest level of the tree, but we did not find the element (it does not exist)
         if (current == null) {
             ifRemoved = false;
             return false;
         }
 
-        /* Рекурсивный случай, мы все еще находим элемент для удаления */
+        // Recursive case, we still find the element to delete
         else {
 
             if (!current.getLeftElement().equals(element)) {
 
-                // Если справа нет элемента или удаляемый элемент меньше правого элемента
+                // If there is no element on the right or the element to be deleted is smaller than the right element
                 if (current.getRightElement() == null || current.getRightElement().compareTo(element) == ROOT_IS_BIGGER) {
 
-                    // Левый элемент больше, чем удаляемый элемент, поэтому мы проходим левый дочерний элемент
+                    // The left element is larger than the element to be deleted, so we go through the left child element
                     if (current.getLeftElement().compareTo(element) == ROOT_IS_BIGGER) {
-                        ifRemoved = remove(current.left, element);
+                        ifRemoved = remove(current.leftChild, element);
                     }
 
-                    // Иначе проходим средний дочерний элемент
+                    // Otherwise -> try to remove the middle child
                     else {
-                        ifRemoved = remove(current.mid, element);
+                        ifRemoved = remove(current.middleChild, element);
                     }
 
                 } else {
 
-                    // Если удаляемый элемент не равен нужному элементу, мы проходим правого потомка
+                    // If the element to be deleted is not equal to the desired element, we pass the right child
                     if (!current.getRightElement().equals(element)) {
-                        ifRemoved = remove(current.right, element);
+                        ifRemoved = remove(current.rightChild, element);
                     }
 
-                    // Иначе, мы нашли элемент
+                    // Otherwise, we found an element
                     else {
 
-                        // *** Ситуация 1 ***
-                        // Элемент равен правому элементу листа, поэтому мы просто удаляем его
+                        // *** Situation 1 ***
+                        // The element is equal to the right element of the sheet, so we just delete it
                         if (current.isLeaf()) {
                             current.setRightElement(null);
                         }
 
-                        // *** Ситуация 2 ***
-                        // Мы нашли элемент, но его нет в листе
+                        // *** Situation 2 ***
+                        // We found the element, but it is not in the sheet
                         else {
 
-                            // Мы получаем элемент "min" правой ветви, удаляем его из текущей позиции и помещаем туда,
-                            // где нашли элемент для удаления
+                            // We get the min element of the right branch,
+                            // delete it from the current position and place it where we found the element to delete.
                             T replacement = (T) current.getRightNode().replaceMin();
-
                             current.setRightElement(replacement);
                         }
                     }
                 }
             }
 
-            /* Левый элемент равен элементу для удаления */
+            // The left element is equal to the element to be deleted.
             else {
 
-                // *** Ситуация 1 ***
+                // *** Situation 1 ***
                 if (current.isLeaf()) {
 
-                    // Левый элемент, элемент для удаления, заменяется правым элементом
+                    // The left element, the element to delete, is replaced by the right element
                     if (current.getRightElement() != null) {
                         current.setLeftElement(current.getRightElement());
                         current.setRightElement(null);
 
                     }
 
-                    // Если справа нет элемента, потребуется перебалансировка
+                    // If there is no element on the right, then balancing is required
                     else {
-                        current.setLeftElement(null); // Отпускаем узел
+                        current.setLeftElement(null); // Release the node
                         return true;
                     }
                 }
 
-                // *** Ситуация 2 ***
+                // *** Situation 2 ***
                 else {
 
-                    // Перемещаем элемент "max" левой ветви, где мы нашли элемент
+                    // Move the "max" element of the left branch, where we found the element
                     T replacement = (T) current.getLeftNode().replaceMax();
                     current.setLeftElement(replacement);
                 }
             }
         }
 
-        // Нижний уровень должен быть сбалансирован
-        if (current != null && !current.isBalanced()) {
+        // The lower level must be balanced
+        if (!current.isBalanced()) {
             current.reBalance();
-        } else if (current != null && !current.isLeaf()) {
 
+        } else if (!current.isLeaf()) {
             boolean isBalanced = false;
 
             while (!isBalanced) {
-
                 if (current.getRightNode() == null) {
 
-                    // Критический случай ситуации 2 у левого потомка
+                    // A critical case of situation 2 for the left child
                     if (current.getLeftNode().isLeaf() && !current.getMidNode().isLeaf()) {
                         T replacement = (T) current.getMidNode().replaceMin();
                         T tempLeft = (T) current.getLeftElement();
@@ -358,9 +350,8 @@
                         add(tempLeft);
                     }
 
-                    // Критический случай ситуации 2 у правого потомка
+                    // A critical case of situation 2 for the right child
                     else if (!current.getLeftNode().isLeaf() && current.getMidNode().isLeaf()) {
-
                         if (current.getRightElement() == null) {
                             T replacement = (T) current.getLeftNode().replaceMax();
                             T tempLeft = (T) current.getLeftElement();
@@ -372,7 +363,6 @@
                 }
 
                 if (current.getRightNode() != null) {
-
                     if (current.getMidNode().isLeaf() && !current.getRightNode().isLeaf()) {
                         current.getRightNode().reBalance();
                     }
@@ -396,7 +386,7 @@
     }
 
     /**
-     * Метод, для удаления всех элементов из дерева
+     * Method for removing all elements from a tree
      */
     public void clear() {
         this.size = 0;
@@ -404,14 +394,17 @@
     }
 
     /**
-     * Метод, для поиска элемента в дереве
+     * Method for finding an element in a tree
      *
-     * @param element элемент, который нужно найти
-     * @return true, если элемент был найден, иначе false
+     * @param element - element to find
+     * @return true, if the element was found, otherwise false
      */
     public boolean search(T element) {
-        if (root == null) return false;
-        return search(root, element);
+        if (root == null) {
+            return false;
+        } else {
+            return search(root, element);
+        }
     }
 
     private boolean search(Node current, T element) {
@@ -419,29 +412,29 @@
 
         if (current != null) {
 
-            /* В тривиальном случае -> мы нашли элемент */
+            // In the trivial case -> found an element
             if (current.leftElement != null && current.leftElement.equals(element)) {
                 ifFound = true;
             }
 
-            /* Мы еще не на самом глубоком уровне */
+            // Otherwise -> not yet at the deepest level
             else {
 
-                // Элемент для поиска равен правому элементу
+                // Search element equals right element
                 if (current.rightElement != null && current.rightElement.equals(element)) {
                     ifFound = true;
                 }
 
-                // иначе -> рекурсивные вызовы
+                // Otherwise -> recursive calls
                 else {
                     if (current.leftElement.compareTo(element) == ROOT_IS_BIGGER) {
-                        ifFound = search(current.left, element);
+                        ifFound = search(current.leftChild, element);
 
-                    } else if (current.right == null || current.rightElement.compareTo(element) == ROOT_IS_BIGGER) {
-                        ifFound = search(current.mid, element);
+                    } else if (current.rightChild == null || current.rightElement.compareTo(element) == ROOT_IS_BIGGER) {
+                        ifFound = search(current.middleChild, element);
 
                     } else if (current.rightElement.compareTo(element) == ROOT_IS_SMALLER) {
-                        ifFound = search(current.right, element);
+                        ifFound = search(current.rightChild, element);
 
                     } else return false;
                 }
@@ -452,9 +445,9 @@
     }
 
     /**
-     * Метод, для поиска минимального значения
+     * Method for finding the minimum value
      *
-     * @return найденное минимальное значение, иначе null
+     * @return minimum value, otherwise null
      */
     public T findMin() {
         if (isEmpty()) return null;
@@ -463,128 +456,126 @@
 
     private T findMin(Node current) {
 
-        // получаем минимальный элемент
+        // Get the minimum element
         if (current.getLeftNode() == null) {
             return (T) current.leftElement;
         }
 
-        // иначе -> рекурсивные вызовы
+        // Otherwise -> recursive calls
         else {
             return findMin(current.getLeftNode());
         }
     }
 
     /**
-     * Метод, для поиска максимального значения
+     * Method for finding the maximum value
      *
-     * @return найденное максимальное значение, иначе null
+     * @return maximum value, otherwise null
      */
     public T findMax() {
-        if (isEmpty()) return null;
-        return findMax(root);
+        if (isEmpty()) {
+            return null;
+        } else {
+            return findMax(root);
+        }
     }
 
     private T findMax(Node current) {
 
-        // рекурсивные вызовы
+        // Recursive calls
         if (current.rightElement != null && current.getRightNode() != null) {
             return findMax(current.getRightNode());
         } else if (current.getMidNode() != null) {
             return findMax(current.getMidNode());
         }
 
-        // получаем максимальный элемент
-        if (current.rightElement != null) return (T) current.rightElement;
-        else return (T) current.leftElement;
+        // Get the maximum element
+        if (current.rightElement != null) {
+            return (T) current.rightElement;
+        } else {
+            return (T) current.leftElement;
+        }
+    }
+
+    public void inOrder() {
+        if (!isEmpty()) {
+            inOrder(root);
+        } else {
+            System.out.print("The tree is empty...");
+        }
     }
 
     /**
-     * Метод, для вывода элементов дерева в порядке способа - "in-order"
+     * Method for displaying tree elements in the order of the method - "in-order"
      */
-    public void inOrder() {
-
-        if (!isEmpty()) inOrder(root);
-        else System.out.print("The tree is empty...");
-    }
-
     private void inOrder(Node current) {
-
         if (current != null) {
 
             if (current.isLeaf()) {
-
                 System.out.print(current.getLeftElement().toString() + " ");
                 if (current.getRightElement() != null) {
                     System.out.print(current.getRightElement().toString() + " ");
                 }
-            } else {
 
+            } else {
                 inOrder(current.getLeftNode());
                 System.out.print(current.getLeftElement().toString() + " ");
                 inOrder(current.getMidNode());
 
                 if (current.getRightElement() != null) {
-
                     if (!current.isLeaf()) {
                         System.out.print(current.getRightElement().toString() + " ");
                     }
-
                     inOrder(current.getRightNode());
                 }
             }
         }
     }
 
-    /**
-     * Метод, для вывода элементов дерева в порядке способа - "pre-order"
-     */
     public void preOrder() {
-
         if (!isEmpty()) {
-
             preOrder(root);
-        } else System.out.print("The tree is empty...");
-    }
-
-    private void preOrder(Node current) {
-
-        if (current != null) {
-
-            System.out.print(current.leftElement.toString() + " ");
-            preOrder(current.left);
-            preOrder(current.mid);
-
-            if (current.rightElement != null) {
-
-                System.out.print(current.rightElement.toString() + " ");
-                preOrder(current.right);
-            }
+        } else {
+            System.out.print("The tree is empty...");
         }
     }
 
     /**
-     * Метод, для вывода элементов дерева в порядке способа - "post-order"
+     * Method for displaying tree elements in the order of the method - "pre-order"
      */
-    public void postOrder() {
+    private void preOrder(Node current) {
+        if (current != null) {
+            System.out.print(current.leftElement.toString() + " ");
+            preOrder(current.leftChild);
+            preOrder(current.middleChild);
 
-        if (!isEmpty()) {
-
-            postOrder(root);
-        } else System.out.print("The tree is empty...");
+            if (current.rightElement != null) {
+                System.out.print(current.rightElement.toString() + " ");
+                preOrder(current.rightChild);
+            }
+        }
     }
 
+    public void postOrder() {
+        if (!isEmpty()) {
+            postOrder(root);
+        } else {
+            System.out.print("The tree is empty...");
+        }
+    }
+
+    /**
+     * Method for displaying tree elements in the order of the method - "post-order"
+     */
     private void postOrder(Node current) {
-
         if (current != null) {
-
-            postOrder(current.left);
-            postOrder(current.mid);
+            postOrder(current.leftChild);
+            postOrder(current.middleChild);
             System.out.print(current.leftElement.toString() + " ");
 
             if (current.rightElement != null) {
-
                 System.out.print(current.rightElement.toString() + " ");
-                postOrder(current.right);
+                postOrder(current.rightChild);
             }
         }
     }
