@@ -9,9 +9,9 @@
 Description project: structure and processing of [2-3-tree](https://en.wikipedia.org/wiki/2–3_tree).  
 Also presented is my term paper on this topic (but in Ukrainian). 
   
-Below is an `application class diagram`:
+Below is an `application class diagram:`
 <p align="center">
-  <img width="780px" height="480px" alt="Application class diagram" title="Application class diagram" 
+  <img width="680px" height="580px" alt="Application class diagram" title="Application class diagram" 
         src="https://github.com/SValentyn/2-3-tree/blob/master/diagram.png">
 </p>
   
