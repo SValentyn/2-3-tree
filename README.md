@@ -7,7 +7,6 @@
  ---
  
 Description project: structure and processing of [2-3-tree](https://en.wikipedia.org/wiki/2–3_tree).  
-Also presented is my term paper on this topic (but in Ukrainian). 
   
 Below is an `application class diagram:`
 <p align="center">
